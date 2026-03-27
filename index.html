@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>UFU Expenses Portal</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f4f6f4;min-height:100vh;padding:2rem 1rem;color:#1a1a1a}
+.card{background:white;border:1px solid #d4e8d4;border-radius:12px;padding:1.75rem;max-width:560px;margin:0 auto}
+.brand{display:flex;align-items:center;gap:10px;margin-bottom:1.75rem;padding-bottom:1.25rem;border-bottom:1px solid #e8f0e8}
+.brand-icon{width:36px;height:36px;border-radius:8px;background:#085041;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.brand-name{font-size:15px;font-weight:600;color:#1a1a1a;line-height:1.2}
+.brand-sub{font-size:12px;color:#666}
+h2{font-size:18px;font-weight:600;color:#1a1a1a;margin-bottom:4px}
+.hint{font-size:13px;color:#666;margin-bottom:1.5rem;line-height:1.5}
+.field{margin-bottom:1.1rem}
+label{display:block;font-size:13px;font-weight:500;color:#444;margin-bottom:5px}
+.req{color:#0F6E56;margin-left:2px}
+input[type=text],input[type=email],input[type=number],input[type=password],select,textarea{width:100%;padding:9px 12px;font-size:14px;border:1px solid #ccc;border-radius:8px;background:white;color:#1a1a1a;font-family:inherit}
+input:focus,select:focus,textarea:focus{outline:none;border-color:#0F6E56;box-shadow:0 0 0 3px rgba(15,110,86,0.1)}
+textarea{resize:vertical;min-height:80px}
+.toggle-row{display:flex;gap:8px}
+.toggle-btn{flex:1;padding:9px;font-size:14px;border:1px solid #ccc;border-radius:8px;background:white;color:#666;cursor:pointer;font-family:inherit;transition:all 0.15s}
+.toggle-btn.active{background:#E1F5EE;border-color:#0F6E56;color:#085041;font-weight:500}
+.upload-zone{border:2px dashed #ccc;border-radius:8px;padding:1.25rem;text-align:center;cursor:pointer;background:#f9f9f9;transition:border-color 0.15s,background 0.15s}
+.upload-zone:hover,.upload-zone.drag{border-color:#0F6E56;background:#E1F5EE}
+.upload-zone p{font-size:13px;color:#666;margin-top:6px}
+.upload-zone span{color:#0F6E56;font-weight:500}
+.file-list{margin-top:8px;display:flex;flex-direction:column;gap:5px}
+.fchip{display:flex;align-items:center;gap:8px;background:#f4f4f4;border:1px solid #e0e0e0;border-radius:8px;padding:7px 10px;font-size:13px}
+.fchip-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#1a1a1a}
+.fchip-size{color:#888;white-space:nowrap;font-size:12px}
+.fchip-rm{background:none;border:none;cursor:pointer;color:#888;font-size:18px;line-height:1;padding:0 2px}
+.fchip-rm:hover{color:#c0392b}
+.divider{border:none;border-top:1px solid #e8f0e8;margin:1.25rem 0}
+.btn{width:100%;padding:11px;background:#085041;color:white;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:background 0.15s}
+.btn:hover{background:#0F6E56}
+.btn:disabled{background:#aaa;cursor:not-allowed}
+.err-msg{font-size:12px;color:#c0392b;margin-top:5px}
+.err-box{font-size:13px;color:#c0392b;background:#fdf0f0;border:1px solid #f5c6c6;border-radius:8px;padding:10px 12px;margin-bottom:12px}
+.step-dots{display:flex;gap:6px;justify-content:center;margin-bottom:1.5rem}
+.dot{width:6px;height:6px;border-radius:50%;background:#ccc}
+.dot.active{background:#0F6E56;width:18px;border-radius:3px}
+.dot.done{background:#9FE1CB}
+.success-wrap{text-align:center;padding:1rem 0}
+.success-circle{width:52px;height:52px;border-radius:50%;background:#E1F5EE;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem}
+.ref{display:inline-block;background:#f4f4f4;border:1px solid #ddd;border-radius:8px;padding:6px 14px;font-family:monospace;font-size:13px;margin-top:10px;color:#1a1a1a}
+.summary-box{background:#f9f9f9;border:1px solid #e0e0e0;border-radius:8px;padding:12px 14px;margin-bottom:1.25rem;text-align:left}
+.summary-row{display:flex;justify-content:space-between;font-size:13px;padding:3px 0}
+.summary-row span:first-child{color:#666}
+.summary-row span:last-child{color:#1a1a1a;font-weight:500}
+.lock-icon{width:48px;height:48px;border-radius:50%;background:#f4f4f4;border:1px solid #ddd;display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem}
+</style>
+</head>
+<body>
+<div class="card">
+
+<div class="brand">
+  <div class="brand-icon">
+    <svg width="20" height="20" fill="none" viewBox="0 0 20 20"><path d="M3 6h14M3 10h9M3 14h6" stroke="white" stroke-width="1.4" stroke-linecap="round"/></svg>
+  </div>
+  <div>
+    <div class="brand-name">Ulster Farmers' Union</div>
+    <div class="brand-sub">Expenses submission portal</div>
+  </div>
+</div>
+
+<div id="view-gate">
+  <div class="step-dots"><div class="dot active"></div><div class="dot"></div><div class="dot"></div></div>
+  <div class="lock-icon">
+    <svg width="20" height="20" fill="none" viewBox="0 0 20 20"><rect x="4" y="9" width="12" height="9" rx="2" stroke="#666" stroke-width="1.2"/><path d="M7 9V6a3 3 0 0 1 6 0v3" stroke="#666" stroke-width="1.2" stroke-linecap="round"/><circle cx="10" cy="13.5" r="1" fill="#666"/></svg>
+  </div>
+  <h2 style="text-align:center;margin-bottom:4px">Access required</h2>
+  <p class="hint" style="text-align:center">Enter the keyword provided by your group coordinator to access the expenses form.</p>
+  <div class="field">
+    <label>Keyword<span class="req">*</span></label>
+    <input type="password" id="kw-input" placeholder="Enter your keyword" autocomplete="off"/>
+    <div class="err-msg" id="kw-err" style="display:none">Incorrect keyword. Please check with your coordinator.</div>
+  </div>
+  <button class="btn" onclick="checkKeyword()">Continue</button>
+</div>
+
+<div id="view-form" style="display:none">
+  <div class="step-dots"><div class="dot done"></div><div class="dot active"></div><div class="dot"></div></div>
+  <h2>Expense claim</h2>
+  <p class="hint">Complete all required fields and attach your receipts.</p>
+  <div class="field">
+    <label>Group<span class="req">*</span></label>
+    <select id="f-group">
+      <option value="">Select your group</option>
+      <option>Antrim</option><option>Armagh</option><option>Down</option>
+      <option>Fermanagh</option><option>Londonderry</option><option>Tyrone</option>
+      <option>Other</option>
+    </select>
+    <div class="err-msg" id="err-group" style="display:none">Please select a group</div>
+  </div>
+  <div class="field">
+    <label>Office name<span class="req">*</span></label>
+    <input type="text" id="f-office" placeholder="e.g. Antrim Area Office"/>
+    <div class="err-msg" id="err-office" style="display:none">Please enter an office name</div>
+  </div>
+  <div class="field">
+    <label>Your name<span class="req">*</span></label>
+    <input type="text" id="f-name" placeholder="Full name"/>
+    <div class="err-msg" id="err-name" style="display:none">Please enter your name</div>
+  </div>
+  <div class="field">
+    <label>Email address<span class="req">*</span></label>
+    <input type="email" id="f-email" placeholder="you@example.com"/>
+    <div class="err-msg" id="err-email" style="display:none">Please enter a valid email</div>
+  </div>
+  <div class="divider"></div>
+  <div class="field">
+    <label>Total expenses amount (£)<span class="req">*</span></label>
+    <input type="number" id="f-total" placeholder="0.00" step="0.01" min="0"/>
+    <div class="err-msg" id="err-total" style="display:none">Please enter a total amount</div>
+  </div>
+  <div class="field">
+    <label>Multiple expenses?<span class="req">*</span></label>
+    <div class="toggle-row">
+      <button class="toggle-btn" id="btn-yes" onclick="setMulti(true)">Yes — multiple items</button>
+      <button class="toggle-btn" id="btn-no" onclick="setMulti(false)">No — single expense</button>
+    </div>
+    <div class="err-msg" id="err-multi" style="display:none">Please select an option</div>
+  </div>
+  <div class="field">
+    <label>Description / notes</label>
+    <textarea id="f-desc" rows="3" placeholder="Brief description of expense(s)..."></textarea>
+  </div>
+  <div class="divider"></div>
+  <div class="field">
+    <label>Receipts & documents<span class="req">*</span></label>
+    <div class="upload-zone" id="drop-zone" onclick="document.getElementById('f-files').click()" ondragover="dOver(event)" ondragleave="dLeave()" ondrop="dDrop(event)">
+      <svg width="22" height="22" fill="none" viewBox="0 0 22 22" style="margin:0 auto"><path d="M11 4v12M7 8l4-4 4 4" stroke="#0F6E56" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 15v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" stroke="#666" stroke-width="1.4" stroke-linecap="round"/></svg>
+      <p><span>Click to upload</span> or drag and drop</p>
+      <p style="font-size:12px;margin-top:2px">PDF, JPG, PNG — max 10 MB each</p>
+      <input type="file" id="f-files" multiple accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="addFiles(this.files)"/>
+    </div>
+    <div class="file-list" id="file-list"></div>
+    <div class="err-msg" id="err-files" style="display:none">Please attach at least one receipt</div>
+  </div>
+  <div class="err-box" id="form-err" style="display:none"></div>
+  <button class="btn" id="submit-btn" onclick="submitForm()">Submit expense claim</button>
+  <p style="font-size:12px;color:#888;text-align:center;margin-top:10px">Submitted securely to SharePoint via Power Automate</p>
+</div>
+
+<div id="view-success" style="display:none">
+  <div class="step-dots"><div class="dot done"></div><div class="dot done"></div><div class="dot active"></div></div>
+  <div class="success-wrap">
+    <div class="success-circle">
+      <svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#0F6E56" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <h2>Claim submitted</h2>
+    <p class="hint" style="margin-bottom:12px">Your expense claim has been received and sent to SharePoint for processing.</p>
+    <div class="summary-box" id="success-summary"></div>
+    <div class="ref" id="ref-code"></div>
+    <br/><br/>
+    <button class="btn" onclick="resetAll()">Submit another claim</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+const KEYWORD='UFU\u00a3xpenses';
+const WEBHOOK='https://defaultbc30236a5a9d41e3b8f07660ec3600.52.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/44f65acaedec4ea9a272e5f9af85d03e/triggers/manual/paths/invoke?api-version=1';
+let files=[],multiVal=null;
+
+function checkKeyword(){
+  if(document.getElementById('kw-input').value===KEYWORD){
+    document.getElementById('kw-err').style.display='none';
+    show('view-gate','view-form');
+  } else {
+    document.getElementById('kw-err').style.display='block';
+    document.getElementById('kw-input').value='';
+  }
+}
+document.getElementById('kw-input').addEventListener('keydown',e=>{if(e.key==='Enter')checkKeyword();});
+
+function setMulti(v){
+  multiVal=v;
+  document.getElementById('btn-yes').className='toggle-btn'+(v?' active':'');
+  document.getElementById('btn-no').className='toggle-btn'+(!v?' active':'');
+  document.getElementById('err-multi').style.display='none';
+}
+
+function dOver(e){e.preventDefault();document.getElementById('drop-zone').classList.add('drag');}
+function dLeave(){document.getElementById('drop-zone').classList.remove('drag');}
+function dDrop(e){e.preventDefault();dLeave();addFiles(e.dataTransfer.files);}
+
+function addFiles(fl){
+  Array.from(fl).forEach(f=>{
+    if(f.size>10*1024*1024){alert(f.name+' is over 10 MB.');return;}
+    if(!files.find(x=>x.name===f.name&&x.size===f.size))files.push(f);
+  });
+  renderFiles();
+}
+
+function renderFiles(){
+  document.getElementById('file-list').innerHTML=files.map((f,i)=>
+    `<div class="fchip"><span class="fchip-name">${f.name}</span><span class="fchip-size">${(f.size/1024).toFixed(0)} KB</span><button class="fchip-rm" onclick="rmFile(${i})">×</button></div>`
+  ).join('');
+}
+function rmFile(i){files.splice(i,1);renderFiles();}
+function toB64(f){return new Promise(r=>{let fr=new FileReader();fr.onload=()=>r(fr.result.split(',')[1]);fr.readAsDataURL(f);});}
+
+function validate(){
+  let ok=true;
+  [['f-group','err-group',v=>v!==''],['f-office','err-office',v=>v.trim()!==''],['f-name','err-name',v=>v.trim()!==''],['f-email','err-email',v=>/\S+@\S+\.\S+/.test(v)],['f-total','err-total',v=>parseFloat(v)>0]].forEach(([id,eid,test])=>{
+    let pass=test(document.getElementById(id).value);
+    document.getElementById(eid).style.display=pass?'none':'block';
+    if(!pass)ok=false;
+  });
+  if(multiVal===null){document.getElementById('err-multi').style.display='block';ok=false;}
+  else document.getElementById('err-multi').style.display='none';
+  if(files.length===0){document.getElementById('err-files').style.display='block';ok=false;}
+  else document.getElementById('err-files').style.display='none';
+  return ok;
+}
+
+async function submitForm(){
+  if(!validate())return;
+  let btn=document.getElementById('submit-btn');
+  btn.disabled=true;btn.textContent='Submitting…';
+  document.getElementById('form-err').style.display='none';
+  let attachments=await Promise.all(files.map(async f=>({name:f.name,type:f.type,data:await toB64(f)})));
+  let payload={submittedAt:new Date().toISOString(),group:document.getElementById('f-group').value,office:document.getElementById('f-office').value.trim(),name:document.getElementById('f-name').value.trim(),email:document.getElementById('f-email').value.trim(),totalAmount:parseFloat(document.getElementById('f-total').value).toFixed(2),multipleExpenses:multiVal,description:document.getElementById('f-desc').value.trim(),attachments};
+  try{
+    let res=await fetch(WEBHOOK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    if(res.ok||res.status===202){
+      let ref='UFU-'+Date.now().toString(36).toUpperCase().slice(-6);
+      document.getElementById('ref-code').textContent='Reference: '+ref;
+      document.getElementById('success-summary').innerHTML=`<div class="summary-row"><span>Name</span><span>${payload.name}</span></div><div class="summary-row"><span>Group</span><span>${payload.group}</span></div><div class="summary-row"><span>Office</span><span>${payload.office}</span></div><div class="summary-row"><span>Total</span><span>£${payload.totalAmount}</span></div><div class="summary-row"><span>Multiple expenses</span><span>${multiVal?'Yes':'No'}</span></div><div class="summary-row"><span>Files attached</span><span>${files.length}</span></div>`;
+      show('view-form','view-success');
+    } else {throw new Error('HTTP '+res.status);}
+  } catch(e){
+    document.getElementById('form-err').style.display='block';
+    document.getElementById('form-err').textContent='Submission failed ('+e.message+'). Please try again or contact your coordinator.';
+    btn.disabled=false;btn.textContent='Submit expense claim';
+  }
+}
+
+function resetAll(){
+  files=[];multiVal=null;
+  ['f-office','f-name','f-email','f-total','f-desc'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-group').value='';
+  document.getElementById('btn-yes').className='toggle-btn';
+  document.getElementById('btn-no').className='toggle-btn';
+  renderFiles();
+  show('view-success','view-form');
+  document.getElementById('submit-btn').disabled=false;
+  document.getElementById('submit-btn').textContent='Submit expense claim';
+}
+
+function show(h,s){document.getElementById(h).style.display='none';document.getElementById(s).style.display='block';}
+</script>
+</body>
+</html>
